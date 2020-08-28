@@ -1,15 +1,17 @@
-//==========================================================================================================================================  //
-//                                                                                                                                            //
-//          @Author : Minkai Chen                                                                                                             //
-//          @Date   : 2020/08/13                                                                                                              //
+//==========================================================================================================================================//
+//                                                                                                                                          //
+//          @Author : Minkai Chen                                                                                                           //
+//          @Date   : 2020/08/13                                                                                                            //
 //          @Title  : Line通知小Script，透過getDate()+1 爬取班表相符格子往下5格進行通知                                                            //
 //          @Edit   : 08/17 @Minkai Chen : 修正 通知時若不足5人，後面會多出逗號的issues                                                           //
 //                                       : 修正 新增方法sendMessage() 將訊息通知改為直接向Line Server發送 POST Method ， 不再使用Heroku webhook     //
 //                                       : 報廢 透過 Heroku Webhook 的Get Method                                                              //
 //                                       : 微調 通知格式                                                                                      //
 //                    08/27 @Minkai Chen : Add Post Image Method                                                                            //
-//                                         Test send image with Imgur link and .jpg extension is success.                                   //
-//                                                                                                                                          //
+//                                         Test send image with Imgur link and .png extension is success.                                   //
+//                    08/28 @Minkai Chen : Add Send Sticker Method                                                                          //
+//                                         Sticker Package Id and Sticker Id can be find here                                              //
+//                                            https://devdocs.line.me/files/sticker_list.pdf                                                //
 //========================================================================================================================================= //
 var token = '<發行權杖>'   // 群組 "計中工讀生" 發行權杖  
 
@@ -41,6 +43,16 @@ function doPostMethod() {
   }); 
 }
 
+
+function doSendImage(){
+  sendImage('<訊息>', '<圖片URL>');
+}
+
+function doSendSticker(){
+  sendSticker('<貼圖訊息>','<貼圖PackageId>','<貼圖編號>');
+}
+
+
 function sendMessage(message) {
   var option = {
     method: 'post',
@@ -53,12 +65,6 @@ function sendMessage(message) {
 }
 
 
-
-function doSendImage(){
-  sendImage('<訊息>', '<圖片URL>');
-}
-
-
 function sendImage(message,filelink) {
   var option = {
     method: 'post',
@@ -68,6 +74,19 @@ function sendImage(message,filelink) {
       imageThumbnail : filelink,
       imageFullsize : filelink,
       imagefile : filelink
+    }
+  };
+  UrlFetchApp.fetch('https://notify-api.line.me/api/notify', option);
+}
+
+function sendSticker(msg,pkgid,id) {
+  var option = {
+    method: 'post',
+    headers: { Authorization: 'Bearer ' + token },
+    payload: {
+      message:msg,
+      stickerPackageId:pkgid ,
+      stickerId:id
     }
   };
   UrlFetchApp.fetch('https://notify-api.line.me/api/notify', option);
